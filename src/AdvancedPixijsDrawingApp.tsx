@@ -55,6 +55,7 @@ const AdvancedPixijsDrawingApp: React.FC = () => {
 
   // 브러쉬 텍스처 미리 생성 (한 번만 만들고 재사용)
   const createBrushTexture = useCallback(() => {
+    console.log("텍스쳐 업데이트");
     if (!appRef.current) return;
 
     const settings = brushSettingsRef.current;
@@ -121,6 +122,15 @@ const AdvancedPixijsDrawingApp: React.FC = () => {
     stamp.anchor.set(0.5, 0.5);
     stamp.x = x;
     stamp.y = y;
+
+    // 감마 보정된 알파 적용 (포토샵과 유사)
+    const userOpacity = brushSettingsRef.current.opacity; // 0~1
+    const gamma = 2.2;
+
+    const minVisible = 0.07; // 7% 이하도 살짝 보이게
+    const corrected =
+      minVisible + (1 - minVisible) * Math.pow(userOpacity, gamma);
+    stamp.alpha = corrected;
 
     // 레이어에 추가
     activeLayer.container.addChild(stamp);
